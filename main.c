@@ -1,16 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define TAPE_LEN 65536*sizeof(char)
+#define TAPE_LEN 256
 
 void interpreter(FILE * source)
 {
     // pointer - tape of chars in memory
     // cmd - command symbol from file
-    char * pointer, cmd;
+    int * pointer, *safety, cmd;
     // Allocate memory
-    pointer = malloc(TAPE_LEN);
+    pointer = safety = (int*)malloc(TAPE_LEN*sizeof(int));
+    for(int i = 0; i < TAPE_LEN; i++) {
+        *safety = 0;
+        safety++;
+    }
     do {
-        cmd = (char)getc(source);
+        cmd = getc(source);
         switch(cmd) {
             case '>':
                 pointer++;
@@ -26,6 +30,9 @@ void interpreter(FILE * source)
                 break;
             case '.':
                 putc(*pointer, stdout);
+                break;
+            case ',':
+                *pointer = getc(stdin);
                 break;
             default:
                 continue;
